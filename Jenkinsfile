@@ -17,7 +17,7 @@ pipeline {
                 npm ci
                 npm run build
                 ls -la
-                grep ".*" filename > build/index.html
+                cat build/index.html
                 '''
             }
             
