@@ -31,7 +31,7 @@ pipeline {
             steps {
                 sh'''
                 npm test
-                a
+                echo "a"
                 '''
             }
         }
