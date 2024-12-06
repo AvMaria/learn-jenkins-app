@@ -9,6 +9,11 @@ pipeline {
                     reuseNode true
                 }
             }
+            steps{
+                sh'''
+                echo "a"
+                '''
+            }
             steps {
                 sh'''
                 ls -la
