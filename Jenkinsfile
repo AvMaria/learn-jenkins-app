@@ -17,7 +17,6 @@ pipeline {
                 npm ci
                 npm run build
                 ls -la
-                cat build/index.html
                 '''
             }
             
