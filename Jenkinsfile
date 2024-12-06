@@ -9,11 +9,6 @@ pipeline {
                     reuseNode true
                 }
             }
-            steps{
-                sh'''
-                echo "a"
-                '''
-            }
             steps {
                 sh'''
                 ls -la
@@ -21,7 +16,7 @@ pipeline {
                 npm --version
                 npm ci
                 npm run build
-                ls -la
+                ls -la                
                 '''
             }
             
