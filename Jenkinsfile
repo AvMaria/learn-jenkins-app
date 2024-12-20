@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         NETLIFY_SITE_ID = '40b8e94f-254a-4999-ad02-e5e48845203b'
-        NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+        NETLIFY_AUTH_TOKEN = credentials('netlify-token')        
     }
 
     stages {
@@ -48,7 +48,7 @@ pipeline {
                         }
                     }
                 }
-                stage('E2E') {        
+                stage('Test E2E') {        
                     agent{
                         docker{
                             image'mcr.microsoft.com/playwright:v1.49.1'
@@ -61,12 +61,12 @@ pipeline {
                         node_modules/.bin/serve -s build &
                         sleep 10
                         npx playwright test --reporter=html
-                        echo "E2E completed"
+                        echo "TestE2E completed"
                         '''
                     }
                     post {
                         always{                           
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Test E2E HTML Report', reportTitles: '', useWrapperFileDirectly: true])
                         }
                     }
                 }
@@ -90,6 +90,28 @@ pipeline {
             }
             
         }
+        stage('Prod E2E') {        
+                    agent{
+                        docker{
+                            image'mcr.microsoft.com/playwright:v1.49.1'
+                            reuseNode true
+                        }
+                    }
+                    environment {                        
+                        CI_ENVIRONMENT_URL = 'https://fancy-speculoos-05ae24.netlify.app'
+                    }    
+                    steps {
+                        sh'''                        
+                        npx playwright test --reporter=html
+                        echo "Prod E2E completed"
+                        '''
+                    }
+                    post {
+                        always{                           
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Prod E2E HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                        }
+                    }
+                }
     
     }
     
