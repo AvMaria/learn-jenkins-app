@@ -26,6 +26,7 @@ pipeline {
             }
             
         }
+        /*
         stage ('Testing'){
             parallel{
                 stage('Unit Test') {        
@@ -72,6 +73,14 @@ pipeline {
                 }
             }
         }
+        */
+        stage('Approval') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    input message: 'Ready to Deploy?', ok: 'Yes, i am sure i want to deploy'
+                }
+            }
+        }    
         stage('Deploy staging') {
             agent{
                 docker{
