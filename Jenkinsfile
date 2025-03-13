@@ -87,11 +87,39 @@ pipeline {
                    echo "Deploying to Staging site ID: $NETLIFY_SITE_ID"
                    node_modules/.bin/netlify status 
                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json   
-                   node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json 
+                  
                 '''
+                scriipt {
+                    env.STAGING_URL = sh(script:" node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json ", returnStdout:true)
+                }
             }
             
         }
+
+        stage('Staging E2E') {        
+                    agent{
+                        docker{
+                            image'mcr.microsoft.com/playwright:v1.49.1'
+                            reuseNode true
+                        }
+                    }
+                    environment {                        
+                        CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+                    }    
+                    steps {
+                        sh'''                        
+                        npx playwright test --reporter=html
+                        echo "Stage E2E completed"
+                        '''
+                    }
+                    post {
+                        always{                           
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Stage E2E HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                        }
+                    }
+                }
+    
+    }
         stage('Approval') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
