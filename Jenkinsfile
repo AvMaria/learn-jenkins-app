@@ -117,9 +117,7 @@ pipeline {
                             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Stage E2E HTML Report', reportTitles: '', useWrapperFileDirectly: true])
                         }
                     }
-                }
-    
-    }
+        }           
         stage('Approval') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
@@ -166,7 +164,7 @@ pipeline {
                             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Prod E2E HTML Report', reportTitles: '', useWrapperFileDirectly: true])
                         }
                     }
-                }
+        }
     
     }
     
