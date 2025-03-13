@@ -72,7 +72,7 @@ pipeline {
                 }
             }
         }    
-        
+
         stage('Deploy staging') {        
                     agent{
                         docker{
@@ -90,7 +90,10 @@ pipeline {
                         echo "Deploying to Staging site ID: $NETLIFY_SITE_ID"
                         node_modules/.bin/netlify status 
                         node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
-                        env.STAGING_URL=$(node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json)                           
+                        env.STAGING_URL=$(node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json)
+                        echo "The stage URL is : $env.STAGING_URL"
+                        sleep 5
+                        echo "Executing e2e..."                           
                         npx playwright test --reporter=html
                         echo "Stage E2E completed"
                         '''
