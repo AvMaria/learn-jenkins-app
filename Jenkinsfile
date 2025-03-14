@@ -79,10 +79,7 @@ pipeline {
                             image'mcr.microsoft.com/playwright:v1.49.1'
                             reuseNode true
                         }
-                    }
-                    environment {                        
-                        CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
-                    }    
+                    }                   
                     steps {
                         sh'''
                         npm install netlify-cli node-jq
@@ -90,9 +87,8 @@ pipeline {
                         echo "Deploying to Staging site ID: $NETLIFY_SITE_ID"
                         node_modules/.bin/netlify status 
                         node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
-                        env.STAGING_URL=$(node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json)
-                        echo "The stage URL is : $env.STAGING_URL"
-                        sleep 5
+                        STAGING_URL=$(node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json)
+                        export CI_ENVIRONMENT_URL="$STAGING_URL"                        
                         echo "Executing e2e..."                           
                         npx playwright test --reporter=html
                         echo "Stage E2E completed"
