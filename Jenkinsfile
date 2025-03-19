@@ -12,7 +12,6 @@ pipeline {
             steps{
                 sh'''
                 docker build -t my-playwright .
-
                 '''
             }            
         }
@@ -66,7 +65,6 @@ pipeline {
                     }    
                     steps {
                         sh'''
-                        npm install serve
                         serve -s build &
                         sleep 10
                         npx playwright test --reporter=html
