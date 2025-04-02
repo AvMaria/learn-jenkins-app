@@ -7,29 +7,7 @@ pipeline {
         REACT_APP_VERSION = "1.0.$BUILD_ID"    
     }
 
-    stages {
-        stage ('aws-cli') {
-            agent{
-                docker{
-                    image 'amazon/aws-cli:2.24.27'
-                    args "--entrypoint=''"
-                }
-            }
-            environment {
-                AWS_S3_BUCKET = 'jenkins-app202503201211'
-            }
-            steps{
-                withCredentials([usernamePassword(credentialsId: 'maria-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-                    sh'''
-                        aws --version
-                        echo "Hello S3!"> index.html
-                        aws s3 cp index.html s3://$AWS_S3_BUCKET/index.html
-                    '''
-                }
-                
-            }
-        }
-       
+    stages {         
         stage('Build') {
             agent{
                 docker{
@@ -48,7 +26,29 @@ pipeline {
                 '''
             }
             
-        }        
+        }
+
+        stage ('aws-cli') {
+            agent{
+                docker{
+                    image 'amazon/aws-cli:2.24.27'
+                    args "--entrypoint=''"
+                }
+            }
+            environment {
+                AWS_S3_BUCKET = 'jenkins-app202503201211'
+            }
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'maria-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    sh'''
+                        aws --version                       
+                        aws s3 sync . s3://$AWS_S3_BUCKET
+                    '''
+                }
+                
+            }
+        }   
+
         stage ('Testing'){
             parallel{
                 stage('Unit Test') {        
