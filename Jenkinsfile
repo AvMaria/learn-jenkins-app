@@ -34,7 +34,7 @@ pipeline {
             agent{
                 docker{
                     image 'amazon/aws-cli:2.24.27'
-                    args "--entrypoint=''"
+                    args "_u root --entrypoint=''"
                     reuseNode true
                 }
             }
@@ -42,12 +42,14 @@ pipeline {
             steps{
                 withCredentials([usernamePassword(credentialsId: 'maria-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     sh'''
-                        aws --version                       
-                        aws ecs register-task-definition --cli-input-json file://aws/task-definition-prod.json
+                        aws --version     
+                        yum intall jq -y                  
+                        LATEST_TD_REVISION =$(aws ecs register-task-definition --cli-input-json file://aws/task-definition-prod.json | jq '.taskDefinition.revision')
+                        echo $LATEST_TD_REVISION
                         aws ecs update-service \
                         --cluster jenkinsApp-Cluster-Prod \
                         --service JenfinsApp-service-Prod \
-                        --task-definition JenfinsApp-TaskDefinition-Prod:2
+                        --task-definition JenfinsApp-TaskDefinition-Prod:$LATEST_TD_REVISION
                     '''
                 }
                 
