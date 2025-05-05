@@ -2,9 +2,11 @@ pipeline {
     agent any
 
     environment {
-        NETLIFY_SITE_ID = '40b8e94f-254a-4999-ad02-e5e48845203b'
+       /* NETLIFY_SITE_ID = '40b8e94f-254a-4999-ad02-e5e48845203b'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')  
-        REACT_APP_VERSION = "1.0.$BUILD_ID"    
+        */
+        REACT_APP_VERSION = "1.0.$BUILD_ID"
+        AWS_DEFAULT_REGION = "ap-southeast-2"
     }
 
     stages {         
@@ -28,7 +30,7 @@ pipeline {
             
         }
 
-        stage ('aws-cli') {
+        stage ('deploy prod aws') {
             agent{
                 docker{
                     image 'amazon/aws-cli:2.24.27'
@@ -36,19 +38,23 @@ pipeline {
                     reuseNode true
                 }
             }
+            /*
             environment {
                 AWS_S3_BUCKET = 'jenkins-app202503201211'
             }
+            */
             steps{
                 withCredentials([usernamePassword(credentialsId: 'maria-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     sh'''
                         aws --version                       
                         aws s3 sync build/ s3://$AWS_S3_BUCKET
+                        aws ecs register-task-definition --cli-input-json file://learn-jenkins-app/aws/task-definition-prod.json
                     '''
                 }
                 
             }
-        }   
+        } 
+        /*  below steps are deprecated since i am not longer using netlify
 
         stage ('Testing'){
             parallel{
@@ -153,6 +159,7 @@ pipeline {
                         }
                     }
         }
+        */
     
     }
     
