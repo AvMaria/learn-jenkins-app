@@ -51,6 +51,7 @@ pipeline {
                         --service JenfinsApp-service-Prod \
                         --task-definition JenfinsApp-TaskDefinition-Prod:$LATEST_TD_REVISION
                         aws ecs wait services-stable \
+                        --cluster jenkinsApp-Cluster-Prod \
                         --services JenfinsApp-service-Prod
                     '''
                 }
