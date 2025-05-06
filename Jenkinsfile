@@ -32,7 +32,7 @@ pipeline {
             }
             
         }
-        stage ('deploy prod aws') {
+        stage ('build docker image') {
             agent{
                 docker{
                     image 'amazon/aws-cli:2.24.27'
