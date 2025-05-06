@@ -4,10 +4,8 @@ pipeline {
     stages {
         stage ('Build Docker Image') {
             steps{
-                sh'''
-                docker build -f learn-jenkins-app/ci/Dockerfile-playwright -t my-playwright .
-                docker build -f learn-jenkins-app/ci/Dockerfile-aws-cli -t my-aws-cli .
-                '''
+                sh'docker build -f ci/Dockerfile-playwright -t my-playwright .'
+                sh'docker build -f ci/Dockerfile-aws-cli -t my-aws-cli .'
             }            
         }
     }
