@@ -32,6 +32,21 @@ pipeline {
             }
             
         }
+        stage ('deploy prod aws') {
+            agent{
+                docker{
+                    image 'amazon/aws-cli:2.24.27'
+                    args "-u root --entrypoint=''"
+                    reuseNode true
+                }
+            }
+           
+            steps{
+                sh'''
+                    amazon-linux-extras install docker
+                    docker buil -t myJenkinsApp .'''
+            }
+        }
 
         stage ('deploy prod aws') {
             agent{
